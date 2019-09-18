@@ -129,7 +129,7 @@ export function denormalize<S extends Schema>(
 ): Denormalized<S>;
 
 export type Denormalized<S> = S extends schemas.Entity<infer T>
-  ? T
+  ? T | void
   : S extends schemas.Values<infer Choices>
   ? Record<
       string,

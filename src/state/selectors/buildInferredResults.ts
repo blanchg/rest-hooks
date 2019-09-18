@@ -9,21 +9,12 @@ import { Schema, schemas } from '~/resource/normal';
 export default function buildInferredResults<
   Params extends Readonly<object>,
   S extends Schema
->(schema: S, params: Params): ResultType<S> | null {
+>(schema: S, params: Params | null): ResultType<S> | any {
   if (isEntity(schema)) {
     const id = schema.getId(params, undefined, '');
     // Was unable to infer the entity's primary key from params
     if (id === undefined || id === '') return null;
     return id as any;
-  }
-  if (
-    schema instanceof schemas.Array ||
-    Array.isArray(schema) ||
-    schema instanceof schemas.Values
-  ) {
-    // array schemas should not be inferred because they're likely to be missing many members
-    // Values cannot be inferred because they have aribtrary keys
-    return null;
   }
   if (schema instanceof schemas.Union) {
     const discriminatedSchema = schema.inferSchema(params, undefined, '');
@@ -34,15 +25,22 @@ export default function buildInferredResults<
       schema: schema.getSchemaAttribute(params, parent, ''),
     } as any;
   }
+  if (
+    schema instanceof schemas.Array ||
+    Array.isArray(schema)) {
+      return [];
+    }
+  if(schema instanceof schemas.Values
+  ) {
+    return {};
+  }
   const o = schema instanceof schemas.Object ? (schema as any).schema : schema;
   const resultObject = {} as any;
   for (const k in o) {
     if (!isSchema(o[k])) {
       resultObject[k] = o[k];
     } else {
-      const results = buildInferredResults(o[k], params);
-      if (!results) return null;
-      resultObject[k] = results;
+      resultObject[k] = buildInferredResults(o[k], params);;
     }
   }
   return resultObject;

@@ -26,7 +26,7 @@ export default function useDenormalized<
   }: Pick<ReadShape<S, Params, any>, 'schema' | 'getFetchKey'>,
   params: Params | null,
   state: State<any>,
-): Denormalized<typeof schema> | null {
+): Denormalized<typeof schema> {
   // Select from state
   const entities = state.entities;
   const cacheResults =
@@ -34,7 +34,6 @@ export default function useDenormalized<
 
   // We can grab entities without actual results if the params compute a primary key
   const results = useMemo(() => {
-    if (!params) return null;
     if (cacheResults) return cacheResults;
 
     // in case we don't even have entities for a model yet, denormalize() will throw
@@ -45,29 +44,25 @@ export default function useDenormalized<
 
   // The final denormalize block
   return useMemo(() => {
-    if (!entities || !params || !results) return null;
-
     // Warn users with bad configurations
     if (process.env.NODE_ENV !== 'production' && isEntity(schema)) {
+      const paramEncoding = params ? getFetchKey(
+        params,
+      ) : '';
       if (Array.isArray(results)) {
         throw new Error(
-          `url ${getFetchKey(
-            params,
-          )} has list results when single result is expected`,
+          `url ${paramEncoding} has list results when single result is expected`,
         );
       }
       if (typeof results === 'object') {
         throw new Error(
-          `url ${getFetchKey(
-            params,
-          )} has object results when single result is expected`,
+          `url ${paramEncoding} has object results when single result is expected`,
         );
       }
     }
 
     // Select the actual results now
-    let denormalized = denormalize(results, schema, entities);
-    if (!denormalized) return null;
+    let denormalized = denormalize(results, schema, entities || {});
     // entities are sometimes deleted but not removed from list results
     if (Array.isArray(denormalized)) {
       denormalized = denormalized.filter((entity: any) => entity);
