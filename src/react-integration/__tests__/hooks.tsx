@@ -55,7 +55,7 @@ async function testDispatchFetch(
 function testRestHook(
   callback: () => void,
   state: State<unknown>,
-  dispatch = (v: ActionTypes) => {},
+  dispatch = (v: ActionTypes) => Promise.resolve(),
 ) {
   return renderHook(callback, {
     wrapper: function Wrapper({ children }) {
@@ -542,7 +542,7 @@ describe('useResource()', () => {
 
     const tree = (
       <StateContext.Provider value={state}>
-        <DispatchContext.Provider value={() => {}}>
+        <DispatchContext.Provider value={() => Promise.resolve()}>
           <Suspense fallback={<Fallback />}>
             <ArticleComponentTester />
           </Suspense>{' '}
@@ -612,7 +612,7 @@ describe('useResource()', () => {
 
     const tree = (
       <StateContext.Provider value={state}>
-        <DispatchContext.Provider value={() => {}}>
+        <DispatchContext.Provider value={() => Promise.resolve()}>
           <Suspense fallback={<Fallback />}>
             <ArticleComponentTester invalidIfStale />
           </Suspense>

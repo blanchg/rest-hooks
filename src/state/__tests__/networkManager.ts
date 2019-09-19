@@ -90,7 +90,7 @@ describe('NetworkManager', () => {
 
       const dispatch = jest.fn();
 
-      middleware({ dispatch, getState })(() => {})({
+      middleware({ dispatch, getState })(() => Promise.resolve())({
         ...fetchResolveAction,
         meta: {
           ...fetchResolveAction.meta,
@@ -109,7 +109,7 @@ describe('NetworkManager', () => {
 
       const dispatch = jest.fn();
 
-      middleware({ dispatch, getState })(() => {})({
+      middleware({ dispatch, getState })(() => Promise.resolve())({
         ...fetchResolveAction,
         meta: {
           ...fetchResolveAction.meta,
@@ -152,7 +152,7 @@ describe('NetworkManager', () => {
 
       const dispatch = jest.fn();
 
-      middleware({ dispatch, getState })(() => {})({
+      middleware({ dispatch, getState })(() => Promise.resolve())({
         ...fetchRejectAction,
         meta: {
           ...fetchRejectAction.meta,
@@ -173,7 +173,7 @@ describe('NetworkManager', () => {
 
       const dispatch = jest.fn();
 
-      middleware({ dispatch, getState })(() => {})({
+      middleware({ dispatch, getState })(() => Promise.resolve())({
         ...fetchRejectAction,
         meta: {
           ...fetchRejectAction.meta,
@@ -198,7 +198,7 @@ describe('RequestIdleCallback', () => {
     (global as any).requestIdleCallback = undefined;
     jest.resetModules();
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { RIC } = require('../NetworkManager');
+    const RIC = require('../RIC').default;
     const fn = jest.fn();
     jest.useFakeTimers();
     RIC(fn, {});
