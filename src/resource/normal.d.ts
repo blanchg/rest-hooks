@@ -128,8 +128,28 @@ export function denormalize<S extends Schema>(
   entities: any,
 ): Denormalized<S>;
 
-export type Denormalized<S> = S extends schemas.Entity<infer T>
+export type DenormalizedNullable<S> = S extends schemas.Entity<infer T>
   ? T | void
+  : S extends schemas.Values<infer Choices>
+  ? Record<
+      string,
+      Choices extends schemas.EntityMap<infer T>
+        ? T
+        : Choices extends Schema<infer T>
+        ? T
+        : never
+    >
+  : S extends schemas.Union<infer Choices>
+  ? // TODO: typescript 3.7 make this recursive instead
+    (Choices[keyof Choices] extends schemas.Entity<infer T> ? T : never)
+  : S extends schemas.Object<any, infer O>
+  ? { [K in keyof O]: O[K] extends Schema ? Denormalized<O[K]> : O[K] }
+  : S extends { [key: string]: any }
+  ? { [K in keyof S]: S[K] extends Schema ? Denormalized<S[K]> : S[K] }
+  : S;
+
+export type Denormalized<S> = S extends schemas.Entity<infer T>
+  ? T
   : S extends schemas.Values<infer Choices>
   ? Record<
       string,

@@ -25,13 +25,10 @@ export default function buildInferredResults<
       schema: schema.getSchemaAttribute(params, parent, ''),
     } as any;
   }
-  if (
-    schema instanceof schemas.Array ||
-    Array.isArray(schema)) {
-      return [];
-    }
-  if(schema instanceof schemas.Values
-  ) {
+  if (schema instanceof schemas.Array || Array.isArray(schema)) {
+    return [];
+  }
+  if (schema instanceof schemas.Values) {
     return {};
   }
   const o = schema instanceof schemas.Object ? (schema as any).schema : schema;
@@ -40,7 +37,7 @@ export default function buildInferredResults<
     if (!isSchema(o[k])) {
       resultObject[k] = o[k];
     } else {
-      resultObject[k] = buildInferredResults(o[k], params);;
+      resultObject[k] = buildInferredResults(o[k], params);
     }
   }
   return resultObject;

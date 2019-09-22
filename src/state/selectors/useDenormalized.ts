@@ -5,7 +5,7 @@ import {
   Schema,
   denormalize,
   ResultType,
-  Denormalized,
+  DenormalizedNullable,
 } from '~/resource/normal';
 import buildInferredResults from './buildInferredResults';
 
@@ -26,7 +26,7 @@ export default function useDenormalized<
   }: Pick<ReadShape<S, Params, any>, 'schema' | 'getFetchKey'>,
   params: Params | null,
   state: State<any>,
-): Denormalized<typeof schema> {
+): DenormalizedNullable<typeof schema> {
   // Select from state
   const entities = state.entities;
   const cacheResults =
@@ -46,9 +46,7 @@ export default function useDenormalized<
   return useMemo(() => {
     // Warn users with bad configurations
     if (process.env.NODE_ENV !== 'production' && isEntity(schema)) {
-      const paramEncoding = params ? getFetchKey(
-        params,
-      ) : '';
+      const paramEncoding = params ? getFetchKey(params) : '';
       if (Array.isArray(results)) {
         throw new Error(
           `url ${paramEncoding} has list results when single result is expected`,
