@@ -339,13 +339,13 @@ describe('useResourceNewNew()', () => {
         [UserResource.listShape(), {}],
       );
     });
-    expect(result.current).toBe(null);
     await waitForNextUpdate();
     const [article, users] = result.current;
     expect(article instanceof CoolerArticleResource).toBe(true);
     expect(article.title).toBe(payload.title);
     expect(users).toBeDefined();
     expect(users.length).toBeTruthy();
+    console.log(users);
     expect(users[0] instanceof UserResource).toBe(true);
   });
 
@@ -356,6 +356,6 @@ describe('useResourceNewNew()', () => {
       return 'done';
     });
     expect(result.current).toBe('done');
-    expect(article).toBeNull();
+    expect(article).toBeUndefined();
   });
 });

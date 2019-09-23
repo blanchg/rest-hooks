@@ -11,22 +11,23 @@ export default function buildInferredResults<
   S extends Schema
 >(schema: S, params: Params | null): ResultType<S> | any {
   if (isEntity(schema)) {
+    if (!params) return;
     const id = schema.getId(params, undefined, '');
     // Was unable to infer the entity's primary key from params
-    if (id === undefined || id === '') return null;
+    if (id === undefined || id === '') return;
     return id as any;
   }
   if (schema instanceof schemas.Union) {
     const discriminatedSchema = schema.inferSchema(params, undefined, '');
     // Was unable to infer the entity's schema from params
-    if (discriminatedSchema === undefined) return null;
+    if (discriminatedSchema === undefined) return;
     return {
       id: buildInferredResults(discriminatedSchema, params),
       schema: schema.getSchemaAttribute(params, parent, ''),
     } as any;
   }
   if (schema instanceof schemas.Array || Array.isArray(schema)) {
-    return [];
+    return;
   }
   if (schema instanceof schemas.Values) {
     return {};
@@ -45,5 +46,9 @@ export default function buildInferredResults<
 
 function isSchema(candidate: any) {
   // TODO: improve detection
-  return typeof candidate === 'object' && candidate !== null;
+  return (
+    typeof candidate === 'object' &&
+    candidate !== null &&
+    candidate !== undefined
+  );
 }
